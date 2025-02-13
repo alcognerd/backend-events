@@ -10,12 +10,9 @@ import eventRoutes from "./routes/eventRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
-import attendanceRoutes from "./routes/attendanceRoutes.js";
-import applicationRoutes from "./routes/applicationRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import likeRoutes from "./routes/likeRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 
 import connectDB from "./utils/connectDB.js";
@@ -25,11 +22,12 @@ import logger from "./utils/logger.js";
 dotenv.config();
 
 // Middleware Setup
-app.use(cors({
-        origin:"https://backend.alcognerd.site",
-  credentials: true // if using cookies or authorization headers
-}));
-logger.info(process.env.FRONTEND_URL);
+app.use(
+  cors({
+    origin: "https://backend.alcognerd.site",
+    credentials: true, // if using cookies or authorization headers
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
@@ -55,7 +53,7 @@ app.use(
 // Routes
 app.use(express.static("/var/www/frontend"));
 
-app.get("*", (req, res,next) => {
+app.get("*", (req, res, next) => {
   if (req.originalUrl.startsWith("/api")) {
     return next();
   }
@@ -66,14 +64,9 @@ app.use("/api/events", eventRoutes);
 app.use("/api/comment", commentRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/message", messageRoutes);
-app.use("/api/applications", applicationRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/like", likeRoutes);
-app.get("/api/test-cookie", (req, res) => {
-  res.cookie("test", "12345", { httpOnly: true, secure: true, sameSite: "None" });
-  res.send("Test cookie set!");
-});
 
 // Error Handling
 app.use((err, req, res, next) => {
@@ -86,4 +79,4 @@ server.listen(process.env.PORT || 5000, () => {
   logger.info(
     `🚀 Server running on http://localhost:${process.env.PORT || 5000}`
   );
-});      
+});
