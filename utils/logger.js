@@ -1,19 +1,8 @@
 import { createLogger, format, transports } from "winston";
 import chalk from "chalk";
-import path from "path";
-import fs from "fs";
 
 const { combine, timestamp, printf } = format;
 
-const logDir =
-	process.env.NODE_ENV === "production" ? "/tmp/logs" : path.join(process.cwd(), "logs");
-
-// Ensure the logs directory exists
-// const logDir = path.join(process.cwd(), "logs");
-if (!fs.existsSync(logDir)) {
-	fs.mkdirSync(logDir);
-}
-// const logFilePath = path.join(logDir, "server.log");
 
 const consoleFormat = printf(({ level, message, timestamp }) => {
 	// Regex Patterns
@@ -53,20 +42,12 @@ const consoleFormat = printf(({ level, message, timestamp }) => {
 	}`;
 });
 
-// Plain Text Format for File
-const fileFormat = printf(({ level, message, timestamp }) => {
-	return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-});
 
 const logger = createLogger({
 	level: "info",
 	format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" })),
 	transports: [
-		new transports.Console({ format: consoleFormat }), // Colored console logs
-		new transports.File({
-			filename: path.join(logDir, "app.log"),
-			format: fileFormat,
-		}),
+		new transports.Console({ format: consoleFormat }),
 	],
 });
 

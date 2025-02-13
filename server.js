@@ -1,16 +1,11 @@
-import express, { urlencoded } from "express";
-import cors from "cors";
+import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import swaggerUi from "swagger-ui-express";
-import { fileURLToPath } from "url";
+import { urlencoded } from "express";
 import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-import authRoutes from "./routes/authRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
@@ -21,23 +16,25 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import likeRoutes from "./routes/likeRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 import connectDB from "./utils/connectDB.js";
-import { connectRedis } from "./redis/redis.js";
-import swaggerDocument from "./swagger.js";
 import { app, server, io } from "./socket/socket.js";
 import logger from "./utils/logger.js";
 
 dotenv.config();
 
 // Middleware Setup
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({
+        origin:"https://backend.alcognerd.site",
+  credentials: true // if using cookies or authorization headers
+}));
+logger.info(process.env.FRONTEND_URL);
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 
 connectDB();
-connectRedis();
 
 // 🌈 Morgan - Custom Console Logger
 app.use(
@@ -56,23 +53,27 @@ app.use(
 );
 
 // Routes
-app.get("/ping", (req, res) => {
-  logger.info("Ping request received");
-  res.send("PONG");
+app.use(express.static("/var/www/frontend"));
+
+app.get("*", (req, res,next) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join("/var/www/frontend", "index.html"));
 });
-app.use("/auth", authRoutes);
-app.use("/events", eventRoutes);
-app.use("/comment", commentRoutes);
-app.use("/group", groupRoutes);
-app.use("/message", messageRoutes);
-app.use("/attendance", attendanceRoutes);
-app.use("/applications", applicationRoutes);
-app.use("/payment", paymentRoutes);
-app.use("/profile", profileRoutes);
-app.use("/like", likeRoutes);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use("/admin", express.static(path.join(__dirname, "admin")));
-app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/comment", commentRoutes);
+app.use("/api/group", groupRoutes);
+app.use("/api/message", messageRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/like", likeRoutes);
+app.get("/api/test-cookie", (req, res) => {
+  res.cookie("test", "12345", { httpOnly: true, secure: true, sameSite: "None" });
+  res.send("Test cookie set!");
+});
 
 // Error Handling
 app.use((err, req, res, next) => {
@@ -85,4 +86,4 @@ server.listen(process.env.PORT || 5000, () => {
   logger.info(
     `🚀 Server running on http://localhost:${process.env.PORT || 5000}`
   );
-});
+});      
