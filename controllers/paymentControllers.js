@@ -24,7 +24,7 @@ export const createOrder = async (req, res) => {
 		const group = await Group.findById(req.body.groupId);
 		logger.info(group.toString());
 		console.log("Groups members: " + group.members.length + " limit: " + group.limit);
-		if (group.members.length + 1 > group.limit) {
+		if ((group.members.length - group.moderators.length) + 1 > group.limit) {
 			return res
 				.status(400)
 				.json({ message: "Participants limit reached!", error: "Participants limit reached!" });
