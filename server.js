@@ -24,7 +24,7 @@ dotenv.config();
 // Middleware Setup
 app.use(
   cors({
-    origin: "https://backend.alcognerd.site",
+    origin: "*",
     credentials: true, // if using cookies or authorization headers
   })
 );
