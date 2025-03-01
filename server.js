@@ -18,10 +18,12 @@ import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./utils/connectDB.js";
 import { app, server, io } from "./socket/socket.js";
 import logger from "./utils/logger.js";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware Setup
 app.use(
