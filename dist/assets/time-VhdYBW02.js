@@ -1,0 +1,1 @@
+function c(n){const t=new Date(n),e=String(t.getDate()).padStart(2,"0"),a=t.toLocaleString("en-US",{month:"short"}),o=t.getFullYear(),r=String(t.getHours()).padStart(2,"0"),s=String(t.getMinutes()).padStart(2,"0");return`${e} ${a} ${o} ${r}:${s}`}export{c as f};
